@@ -1,0 +1,41 @@
+`timescale 1ns / 1ns
+
+module uart_reference_model #(parameter width = 8)(
+input wire [width-1:0] tx_data,
+input wire valid_frame,
+input wire stop_bit,
+output reg [width-1:0] exp_rx_data,
+output reg exp_rec_ready,
+output reg exp_rec_busy,
+output reg exp_xmit_active,
+output reg exp_xmit_done,
+output reg exp_uart_xmit_data
+);
+
+always @(*) begin
+exp_rx_data = {width{1'b0}};
+exp_rec_ready = 1'b0;
+exp_rec_busy = 1'b0;
+exp_xmit_active = 1'b0;
+exp_xmit_done = 1'b0;
+exp_uart_xmit_data = 1'b1;
+
+if(valid_frame == 1'b1 && stop_bit == 1'b1) begin
+exp_rx_data = tx_data;
+exp_rec_ready = 1'b1;
+exp_rec_busy = 1'b0;
+end
+else begin
+exp_rx_data = {width{1'b0}};
+exp_rec_ready = 1'b0;
+exp_rec_busy = 1'b0;
+end
+
+if(valid_frame == 1'b1) begin
+exp_xmit_active = 1'b0;
+exp_xmit_done = 1'b1;
+exp_uart_xmit_data = 1'b1;
+end
+end
+
+endmodule
